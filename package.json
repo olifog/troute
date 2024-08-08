@@ -1,0 +1,23 @@
+{
+  "name": "@olifog/troute",
+  "version": "0.1.0",
+  "description": "Simple, opinionated data fetching for Next App router.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.1.0",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.51.21",
+    "@types/react": "^18.3.3",
+    "next": "^14.2.5",
+    "react": "^18.3.1"
+  }
+}
