@@ -1,5 +1,6 @@
 import { QueryClient, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { NextRequest, NextResponse } from "next/server";
+import { TrouteProvider } from "./TrouteProvider";
 
 type QueryFunction = (...args: any[]) => Promise<any>;
 
@@ -58,3 +59,5 @@ export const createTroute = <T extends Queries>(
 };
 
 export const queryClient = new QueryClient();
+
+export { TrouteProvider };
