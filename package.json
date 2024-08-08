@@ -2,6 +2,7 @@
   "name": "@olifog/troute",
   "version": "0.1.0",
   "description": "Simple, opinionated data fetching for the Next App router.",
+  "author": "Oliver Fogelin <oliverfogelin@gmail.com> (https://olifog.com)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -19,5 +20,15 @@
     "@types/react": "^18.3.3",
     "next": "^14.2.5",
     "react": "^18.3.1"
-  }
+  },
+  "keywords": [],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olifog/troute.git"
+  },
+  "bugs": {
+    "url": "https://github.com/olifog/troute/issues"
+  },
+  "homepage": "https://github.com/olifog/troute"
 }
