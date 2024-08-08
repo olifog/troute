@@ -1,7 +1,7 @@
 {
   "name": "@olifog/troute",
   "version": "0.1.0",
-  "description": "Simple, opinionated data fetching for Next App router.",
+  "description": "Simple, opinionated data fetching for the Next App router.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
