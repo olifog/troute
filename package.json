@@ -1,6 +1,6 @@
 {
   "name": "@olifog/troute",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Simple, opinionated data fetching for the Next App router.",
   "author": "Oliver Fogelin <oliverfogelin@gmail.com> (https://olifog.com)",
   "main": "dist/index.js",
