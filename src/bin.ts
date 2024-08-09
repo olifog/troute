@@ -41,7 +41,7 @@ yargs(hideBin(process.argv))
 
     // Extract imports and createTroute object
     const importRegex = /import\s+{([^}]+)}\s+from\s+["']([^"']+)["']/g
-    const createTrouteRegex = /createTroute\(\s*{([^}]+)}\s*\)/
+    const createTrouteRegex = /createTroute\s*\([^,]+,\s*{([^}]+)}\s*\)/
 
     let imports: {names: string[], path: string}[] = []
     let match
@@ -75,12 +75,9 @@ yargs(hideBin(process.argv))
 
     // Determine output path
     const outputDir = path.dirname(troutePath)
-    const outputPath = path.join(outputDir, '.troute', 'actions.ts')
+    const outputPath = path.join(outputDir, '.troute-actions.ts')
 
     DEBUG(`Writing output to ${outputPath}`)
-
-    // Ensure .troute directory exists
-    await fs.mkdir(path.join(outputDir, '.troute'), { recursive: true })
 
     // Write the new file
     await fs.writeFile(outputPath, newFileContent)
