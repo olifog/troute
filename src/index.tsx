@@ -25,6 +25,7 @@ export const createTroute = <T extends Queries>(
   let actionsPromise: Promise<Record<string, Function>> | null = null;
 
   try {
+    console.log("Directory: ", __dirname);
     // @ts-ignore
     actionsPromise = import('./.troute/actions').then(module => module as Record<string, Function>);
   } catch (error) {
