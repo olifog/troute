@@ -67,7 +67,7 @@ yargs(hideBin(process.argv))
     imports.forEach(importItem => {
       const importNames = importItem.names.filter(name => actionNames.includes(name))
       if (importNames.length > 0) {
-        newFileContent += `import { ${importNames.join(', ')} } from ".${importItem.path}";\n`
+        newFileContent += `import { ${importNames.join(', ')} } from "${importItem.path}";\n`
       }
     })
 
