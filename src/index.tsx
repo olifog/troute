@@ -11,6 +11,7 @@ type TrouteResult<T extends Queries> = {
   troute: {
     [K in keyof T]: {
       action: T[K];
+      call: T[K];
       useQuery: (
         input: Parameters<T[K]>[0]
       ) => UseQueryResult<Awaited<ReturnType<T[K]>>, unknown>;
@@ -38,7 +39,11 @@ export const createTroute = <T extends Queries>(
       Object.entries(queries).map(([queryName, query]) => [
         queryName,
         {
-          action: query,
+          call: query,
+          action: async (...args) => {
+            "use server"
+            return await query(...args)
+          },
           useQuery: (input: Parameters<typeof query>[0]) => {
             return useQuery({
               queryKey: [queryName, input],
