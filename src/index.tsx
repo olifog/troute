@@ -22,6 +22,15 @@ type TrouteResult<T extends Queries> = {
 export const createTroute = <T extends Queries>(
   queries: T
 ): TrouteResult<T> => {
+  let actionsPromise: Promise<Record<string, Function>> | null = null;
+
+  try {
+    // @ts-ignore
+    actionsPromise = import('./.troute/actions').then(module => module as Record<string, Function>);
+  } catch (error) {
+    console.warn("No ./.troute/actions file found. Generate it with `npx @olifog/troute generate`");
+  }
+
   return {
     GET: async (request: NextRequest) => {
       const searchParams = request.nextUrl.searchParams;
@@ -41,8 +50,15 @@ export const createTroute = <T extends Queries>(
         {
           call: query,
           action: async (...args) => {
-            "use server"
-            return await query(...args)
+            if (actionsPromise) {
+              const actions = await actionsPromise;
+              const action = actions[queryName];
+              if (typeof action === 'function') {
+                return action(...args);
+              }
+            }
+            console.warn(`No server action found for ${queryName}. Falling back to a direct call.`);
+            return query(...args);
           },
           useQuery: (input: Parameters<typeof query>[0]) => {
             return useQuery({
