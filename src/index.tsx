@@ -13,7 +13,8 @@ type TrouteResult<T extends Queries> = {
       action: T[K];
       call: T[K];
       useQuery: (
-        input: Parameters<T[K]>[0]
+        input: Parameters<T[K]>[0],
+        enabled?: boolean
       ) => UseQueryResult<Awaited<ReturnType<T[K]>>, unknown>;
     };
   };
@@ -50,7 +51,7 @@ export const createTroute = <T extends Queries>(
             console.warn(`No server action found for ${queryName}. Falling back to a direct call.`);
             return query(...args);
           },
-          useQuery: (input: Parameters<typeof query>[0]) => {
+          useQuery: (input: Parameters<typeof query>[0], enabled=true) => {
             return useQuery({
               queryKey: [queryName, input],
               queryFn: async () => {
@@ -61,6 +62,7 @@ export const createTroute = <T extends Queries>(
                 );
                 return res.json() as Promise<Awaited<ReturnType<typeof query>>>;
               },
+              enabled,
             });
           },
         },
