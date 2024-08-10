@@ -48,16 +48,13 @@ export const createTroute = <T extends Queries>(
           return useQuery({
             queryKey: [queryName, params],
             queryFn: async () => {
-              console.log("fetching", queryName, params);
-              const url = new URL("/api/troute");
-              url.searchParams.set("route", queryName);
-              // if (params) {
-              //   url.searchParams.set("input", JSON.stringify(params));
-              // }
-              console.log(url.toString());
+              let url = "/api/troute";
+              url += `?route=${queryName}`;
+              if (params) {
+                url += `&input=${JSON.stringify(params)}`;
+              }
 
               const res = await fetch(url.toString());
-
               return res.json() as Promise<Awaited<ReturnType<typeof query>>>;
             },
             enabled,
