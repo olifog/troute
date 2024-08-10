@@ -51,10 +51,9 @@ export const createTroute = <T extends Queries>(
               console.log("fetching", queryName, params);
               const url = new URL("/api/troute");
               url.searchParams.set("route", queryName);
-              if (params) {
-                url.searchParams.set("input", JSON.stringify(params));
-              }
-
+              // if (params) {
+              //   url.searchParams.set("input", JSON.stringify(params));
+              // }
               console.log(url.toString());
 
               const res = await fetch(url.toString());
