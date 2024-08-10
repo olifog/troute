@@ -2,9 +2,15 @@ import { QueryClient, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { NextRequest, NextResponse } from "next/server";
 import { TrouteProvider } from "./TrouteProvider";
 
-type QueryFunction = (...args: any[]) => Promise<any>;
+type QueryFunction = (...args: unknown[]) => Promise<unknown>;
 
 type Queries = Record<string, QueryFunction>;
+
+type InferQueryInput<T extends (...args: any) => any> = 
+  T extends (input: infer I) => any ? I : undefined;
+
+type InferQueryOutput<T extends (...args: any) => any> = 
+  Awaited<ReturnType<T>>;
 
 type TrouteResult<T extends Queries> = {
   GET: (request: NextRequest) => Promise<NextResponse>;
@@ -12,9 +18,9 @@ type TrouteResult<T extends Queries> = {
     [K in keyof T]: {
       action: T[K];
       call: T[K];
-      useQuery: (
-        input: Parameters<T[K]>[0]
-      ) => UseQueryResult<Awaited<ReturnType<T[K]>>, unknown>;
+      useQuery: InferQueryInput<T[K]> extends undefined
+        ? () => UseQueryResult<InferQueryOutput<T[K]>, unknown>
+        : (input: InferQueryInput<T[K]>) => UseQueryResult<InferQueryOutput<T[K]>, unknown>;
     };
   };
 };
@@ -23,7 +29,6 @@ export const createTroute = <T extends Queries>(
   actions: Record<string, Function>,
   queries: T
 ): TrouteResult<T> => {
-
   return {
     GET: async (request: NextRequest) => {
       const searchParams = request.nextUrl.searchParams;
@@ -42,7 +47,7 @@ export const createTroute = <T extends Queries>(
         queryName,
         {
           call: query,
-          action: async (...args) => {
+          action: async (...args: Parameters<typeof query>) => {
             const action = actions[queryName];
             if (typeof action === 'function') {
               return await action(...args);
@@ -50,7 +55,7 @@ export const createTroute = <T extends Queries>(
             console.warn(`No server action found for ${queryName}. Falling back to a direct call.`);
             return query(...args);
           },
-          useQuery: (input: Parameters<typeof query>[0]) => {
+          useQuery: ((input?: InferQueryInput<typeof query>) => {
             return useQuery({
               queryKey: [queryName, input],
               queryFn: async () => {
@@ -59,10 +64,10 @@ export const createTroute = <T extends Queries>(
                     JSON.stringify(input)
                   )}`
                 );
-                return res.json() as Promise<Awaited<ReturnType<typeof query>>>;
+                return res.json() as Promise<InferQueryOutput<typeof query>>;
               },
             });
-          },
+          }) as TrouteResult<T>['troute'][keyof T]['useQuery'],
         },
       ])
     ) as TrouteResult<T>["troute"],
