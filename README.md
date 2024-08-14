@@ -1,41 +1,33 @@
 
 # Troute
 
-Simple, opinionated data fetching for the Next.js App router. Write all your queries and mutations in the same place, and use them across Server and Client Components easily.
+Simple, opinionated data fetching for the Next.js App router. Write all your queries in the same place, and use them across Server and Client Components easily.
 
 ## What is this?
 
-Server Actions are great for mutations, and are the de facto way of POSTing data in both Server and Client components. It would be great if the same were true for fetching data, and since Server Actions are just *"asynchronous functions executed on the server"* they can be used without issue to fetch data from within Server Components.
+Server Actions are great for mutations, and are the de facto way of POSTing data in both Server and Client components. For fetching data, Server Components can just call the query directly - no server action or API route needed. For Client Components though, you have to write route handlers for every single fetch action, and use a third-party client fetching library like React Query. This gets tedious - it would be cool to just be able to call the queries directly like in Server Components!
 
-Unfortunately, in Client Components using Server Actions to fetch isn't recommended, since under the hood all Server Actions are POST requests and can't make use of caching (and can't send in parallel.) The official recommendation is to create route handlers for each fetch action and use a third-party client fetching library like React Query.
-
-Troute automatically generates these route handlers, and wraps around React Query, allowing you to call server actions to both fetch and mutate data across Client and Server Components easily.
+Troute automatically generates route handlers, and wraps around React Query, allowing you to call those same query functions from Client Components (without having to write all the route handlers.)
 
 ## Example
 
 `queries/user.ts`
 
 ```typescript
-"use server"
-
 import db from ...
 
 export const getUser = async ({id}: {id: string}) => {
   return await db.findUser(id)
-}
-
-export const createUser = async ({name}: {name: string}) => {
-  return await db.createUser(name)
 }
 ```
 
 Fetching from a Server Component:
 
 ```tsx
-import { troute } from '@/troute'
+import { getUser } from "@/queries/user"
 
 export const User = async () => {
-  const user = await troute.getUser.action({id: '123'})
+  const user = await getUser({id: '123'})
 
   return <div>{user.name}</div>
 }
@@ -49,25 +41,9 @@ Fetching from a Client Component:
 import { troute } from '@/troute'
 
 export const User = () => {
-  const { data: user } = troute.getUser.useQuery({id: '123'})
+  const { data: user } = troute.getUser({params: {id: '123'}})
 
   return <div>{user.name}</div>
-}
-```
-
-Mutating from Server or Client Components is as normal:
-
-```tsx
-"use server"
-
-import { postUser } from "@/queries/user"
-
-export const CreateUser = () => {
-  return (
-    <button onClick={() => postUser({name: 'John'})}>
-      Create user
-    </button>
-  )
 }
 ```
 
@@ -109,25 +85,19 @@ export const CreateUser = () => {
     export const {GET, troute} = createTroute({})
     ```
 
-5. Now you can start creating your queries as Server Actions in the `queries` folder (or whatever other name you want):
+5. Now you can start creating your queries as in the `queries` folder (or whatever other name you want):
 
     `queries/user.ts`
 
     ```typescript
-    "use server"
-
     import db from ...
 
     export const getUser = async ({id}: {id: string}) => {
       return await db.findUser(id)
     }
-
-    export const createUser = async ({name}: {name: string}) => {
-      return await db.createUser(name)
-    }
     ```
 
-6. And make sure to add any fetch queries into the createTroute call in `troute.ts`:
+6. And add any fetch queries you want to call from the client into the createTroute call in `troute.ts`:
 
     ```typescript
     import { createTroute } from "@olifog/troute";
