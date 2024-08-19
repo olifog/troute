@@ -16,7 +16,7 @@ type TrouteResult<T extends Queries> = {
   troute: {
     [K in keyof T]: (
       params: Parameters<T[K]>[0],
-      options: Omit<
+      options?: Omit<
         UseQueryOptions<Awaited<ReturnType<T[K]>>, unknown>,
         "queryKey"
       >
