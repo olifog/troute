@@ -1,4 +1,9 @@
-import { QueryClient, useQuery, UseQueryResult } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from "@tanstack/react-query";
 import { NextRequest, NextResponse } from "next/server";
 import { TrouteProvider } from "./TrouteProvider";
 
@@ -9,10 +14,13 @@ type Queries = Record<string, QueryFunction>;
 type TrouteResult<T extends Queries> = {
   GET: (request: NextRequest) => Promise<NextResponse>;
   troute: {
-    [K in keyof T]: (input: {
-      params?: Parameters<T[K]>[0];
-      enabled?: boolean;
-    }) => UseQueryResult<Awaited<ReturnType<T[K]>>, unknown>;
+    [K in keyof T]: (
+      params: Parameters<T[K]>[0],
+      options: Omit<
+        UseQueryOptions<Awaited<ReturnType<T[K]>>, unknown>,
+        "queryKey"
+      >
+    ) => UseQueryResult<Awaited<ReturnType<T[K]>>, unknown>;
   };
 };
 
@@ -38,13 +46,7 @@ export const createTroute = <T extends Queries>(
     troute: Object.fromEntries(
       Object.entries(queries).map(([queryName, query]) => [
         queryName,
-        ({
-          params,
-          enabled = true,
-        }: {
-          params?: Parameters<typeof query>[0];
-          enabled?: boolean;
-        }) => {
+        (params, options) => {
           return useQuery({
             queryKey: [queryName, params],
             queryFn: async () => {
@@ -57,7 +59,7 @@ export const createTroute = <T extends Queries>(
               const res = await fetch(url.toString());
               return res.json() as Promise<Awaited<ReturnType<typeof query>>>;
             },
-            enabled,
+            ...options,
           });
         },
       ])
