@@ -1,32 +1,28 @@
 "use client";
 
 import {
-  DefaultOptions,
   QueryClient,
+  QueryClientConfig,
   QueryClientProvider,
 } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 
 export const TrouteProvider = ({
   children,
-  defaultOptions,
+  queryClientConfig,
 }: Readonly<{
   children: React.ReactNode;
-  defaultOptions?: DefaultOptions<Error>;
+  queryClientConfig?: QueryClientConfig;
 }>) => {
   const [queryClient, setQueryClient] = useState(
     () =>
-      new QueryClient({
-        defaultOptions: defaultOptions ?? {},
-      })
+      new QueryClient(queryClientConfig)
   );
 
   useEffect(() => {
-    const newQueryClient = new QueryClient({
-      defaultOptions: defaultOptions ?? {},
-    });
+    const newQueryClient = new QueryClient(queryClientConfig);
     setQueryClient(newQueryClient);
-  }, [JSON.stringify(defaultOptions)]);
+  }, [JSON.stringify(queryClientConfig)]);
 
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
