@@ -1,5 +1,4 @@
 import {
-  QueryClient,
   useQuery,
   UseQueryOptions,
   UseQueryResult,
@@ -66,7 +65,5 @@ export const createTroute = <T extends Queries>(
     ) as TrouteResult<T>["troute"],
   };
 };
-
-export const queryClient = new QueryClient();
 
 export { TrouteProvider };
