@@ -23,8 +23,13 @@ type TrouteResult<T extends Queries> = {
   };
 };
 
+export interface CreateTrouteOptions {
+  errorHandler: (_error: any) => NextResponse<{error: string}>
+}
+
 export const createTroute = <T extends Queries>(
-  queries: T
+  queries: T,
+  options?: CreateTrouteOptions
 ): TrouteResult<T> => {
   return {
     GET: async (request: NextRequest) => {
@@ -39,8 +44,14 @@ export const createTroute = <T extends Queries>(
           { status: 404 }
         );
       }
-
-      return NextResponse.json(await query(input));
+      try {
+        return NextResponse.json(await query(input));
+      } catch (e) {
+        if (options?.errorHandler) {
+          return options.errorHandler(e)
+        }
+        throw e;
+      }
     },
     troute: Object.fromEntries(
       Object.entries(queries).map(([queryName, query]) => [
